@@ -14,7 +14,7 @@ function gcom {
     $branch = git rev-parse --abbrev-ref HEAD 2>$null
 
     if (-not $branch) {
-        Write-Host "❌ Não foi possível identificar a branch atual." -ForegroundColor Red
+        Write-Host Set-ExecutionPolicy RemoteSigned -Scope CurrentUser-ForegroundColor Red
         return
     }
 
