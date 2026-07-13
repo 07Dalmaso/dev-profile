@@ -22,6 +22,7 @@ function mig {
         Write-Host "3 - update"
         Write-Host "4 - insert"
         Write-Host "5 - delete"
+        Write-Host "6 - drop"
 
         switch (Read-Host "Escolha a acao") {
             "1" { return "alter" }
@@ -29,6 +30,7 @@ function mig {
             "3" { return "update" }
             "4" { return "insert" }
             "5" { return "delete" }
+            "6" { return "drop" }
             default { return $null }
         }
     }
@@ -67,9 +69,34 @@ function mig {
 
             $objectName = Read-Host "Nome do objeto (ex: sp_xxx)"
 
+            $objectName = $objectName.Trim().Replace(" ", "_")
+
             if ([string]::IsNullOrWhiteSpace($objectName)) {
                 Write-Host "Nome invalido." -ForegroundColor Red
                 return
+            }
+
+            switch ($type) {
+                "procedure" {
+                    if ($objectName -notmatch "^sp_") {
+                        Write-Host "Procedures devem iniciar com 'sp_'" -ForegroundColor Red
+                        return
+                    }
+                }
+
+                "function" {
+                    if ($objectName -notmatch "^fn_") {
+                        Write-Host "Functions devem iniciar com 'fn_'" -ForegroundColor Red
+                        return
+                    }
+                }
+
+                "view" {
+                    if ($objectName -notmatch "^vw_") {
+                        Write-Host "Views devem iniciar com 'vw_'" -ForegroundColor Red
+                        return
+                    }
+                }
             }
 
             $migrationName = "${action}_${objectName}_${type}"
@@ -135,6 +162,61 @@ function mig {
         }
     }
 
-    Write-Host "Executando: $command" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "==========================================" -ForegroundColor DarkGray
+    Write-Host "Resumo da Migration" -ForegroundColor Green
+    Write-Host "==========================================" -ForegroundColor DarkGray
+
+    Write-Host ("Path       : {0}" -f $path)
+
+    if ($migrationName) {
+        Write-Host ("Migration  : {0}" -f $migrationName)
+    }
+
+    if ($objectName) {
+        Write-Host ("Objeto     : {0}" -f $objectName)
+    }
+
+    if ($type) {
+        Write-Host ("Tipo       : {0}" -f $type)
+    }
+
+    Write-Host ""
+    Write-Host ("Comando    : {0}" -f $command) -ForegroundColor Yellow
+    Write-Host ""
     Invoke-Expression $command
+
+    if ($option -in @("4", "5", "6")) {
+
+        Start-Sleep -Milliseconds 300
+
+        $ultimoArquivo = Get-ChildItem -Path $path -Filter "*.php" |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+
+        if ($ultimoArquivo) {
+            code -g $ultimoArquivo.FullName
+        }
+    }
+    
+    if ($option -eq "4") {
+
+        Write-Host ""
+        Write-Host "Proxima acao:" -ForegroundColor Green
+        Write-Host "1 - Nao fazer nada"
+        Write-Host "2 - Executar somente esta migration"
+        Write-Host "3 - Executar todas as migrations do mes"
+
+        switch (Read-Host "Escolha") {
+
+            "2" {
+                $migrationFile = $ultimoArquivo.BaseName
+                Invoke-Expression "php artisan migrate --path=$path/$migrationFile.php"
+            }
+
+            "3" {
+                Invoke-Expression "php artisan migrate --path=$path"
+            }
+        }
+    }
 }
