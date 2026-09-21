@@ -1,0 +1,14 @@
+{
+  "name": "dev-profile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Menus interativos do dev-profile (migrations Laravel)",
+  "type": "module",
+  "bin": {
+    "mig": "bin/mig.js"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.11.0",
+    "picocolors": "^1.1.1"
+  }
+}
