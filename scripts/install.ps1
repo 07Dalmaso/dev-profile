@@ -1,13 +1,14 @@
 <#
-    Instala o dev-profile: comando `mig` global e atalhos carregados em todo
-    PowerShell que abrir. Pode rodar de novo quando quiser: atualiza sem duplicar.
+    Instala o dev-profile: comandos Node globais (mig, phpt, tools, diff-str)
+    e os atalhos de comandos\ carregados em todo PowerShell que abrir. Pode
+    rodar de novo quando quiser: atualiza sem duplicar.
 
     Sem clonar:  irm https://api.github.com/repos/07Dalmaso/dev-profile/contents/scripts/install.ps1 -Headers @{Accept='application/vnd.github.raw'} | iex
                  (API, e nao raw.githubusercontent.com: o Zscaler bloqueia o raw)
     Ja clonado:  duplo clique em install.cmd
 
-    Fica em scripts/ de proposito: a raiz so tem os profile-*.ps1, que sao
-    carregados em todo terminal.
+    Fica em scripts/ de proposito: o bloco abaixo carrega todo profile-*.ps1
+    da raiz em cada terminal, e o profile-carregar.ps1 carrega comandos\.
 #>
 
 # Tudo dentro de uma funcao: via `irm | iex` o script roda na sessao de quem
@@ -103,8 +104,9 @@ Remove-Variable devProfile
         }
     }
 
-    # 4. mig: dependencias e comando global (npm link aponta para esta pasta,
-    #    entao editar bin/mig.js vale na hora). npm.cmd evita o npm.ps1, que a
+    # 4. Comandos Node (mig, phpt, tools, diff-str): dependencias e comandos
+    #    globais (npm link aponta para esta pasta, entao editar os .js de
+    #    comandos\ vale na hora). npm.cmd evita o npm.ps1, que a
     #    politica de execucao pode bloquear.
     Passo 'Comando mig'
     Push-Location $dir

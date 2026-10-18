@@ -5,9 +5,11 @@
   "description": "Menus interativos do dev-profile (migrations Laravel e caixa de ferramentas)",
   "type": "module",
   "bin": {
-    "mig": "bin/mig.js",
-    "diff-str": "bin/diff-str.js",
-    "tools": "bin/tools.js"
+    "mig": "comandos/php/mig.js",
+    "phpt": "comandos/php/phpt.js",
+    "tools": "comandos/ferramentas/tools.js",
+    "diff-str": "comandos/ferramentas/diff-str.js",
+    "demandas": "comandos/demandas/demandas.js"
   },
   "dependencies": {
     "@clack/prompts": "^0.11.0",

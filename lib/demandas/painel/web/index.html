@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel de demandas</title>
+<link rel="stylesheet" href="/painel.css">
+</head>
+<body>
+<header class="topo">
+  <div>
+    <h1>Demandas</h1>
+    <p class="sub" id="sub">carregando...</p>
+  </div>
+  <button type="button" id="atualizar">Atualizar</button>
+</header>
+
+<nav class="abas" role="tablist">
+  <button type="button" role="tab" data-aba="painel" aria-selected="true">Painel</button>
+  <button type="button" role="tab" data-aba="lista" aria-selected="false">Lista</button>
+  <button type="button" role="tab" data-aba="concluidas" aria-selected="false">Concluidas</button>
+</nav>
+
+<main>
+  <p class="erro" id="erro" hidden></p>
+
+  <section id="aba-painel" class="aba">
+    <div class="cartoes" id="cartoes"></div>
+    <div class="graficos">
+      <figure class="grafico">
+        <figcaption>Concluidas por semana <span class="muted">(ultimas 12)</span></figcaption>
+        <div id="grafico-semanas" class="area-grafico"></div>
+        <details><summary>ver como tabela</summary><table id="tabela-semanas"></table></details>
+      </figure>
+      <figure class="grafico">
+        <figcaption>Abertas por projeto</figcaption>
+        <div id="grafico-projetos" class="area-grafico"></div>
+      </figure>
+    </div>
+  </section>
+
+  <section id="aba-lista" class="aba" hidden>
+    <div class="filtros">
+      <select id="f-projeto" aria-label="Projeto"></select>
+      <select id="f-prioridade" aria-label="Prioridade">
+        <option value="">todas as prioridades</option>
+        <option value="alta">alta</option>
+        <option value="media">media</option>
+        <option value="baixa">baixa</option>
+      </select>
+      <select id="f-status" aria-label="Status">
+        <option value="">todos os status</option>
+        <option value="andamento">em andamento</option>
+        <option value="parada">nao comecadas</option>
+      </select>
+      <input id="f-busca" type="search" placeholder="buscar no titulo" aria-label="Buscar">
+    </div>
+    <div class="lista-detalhe">
+      <ul id="lista" class="lista"></ul>
+      <article id="detalhe" class="detalhe" hidden></article>
+    </div>
+  </section>
+
+  <section id="aba-concluidas" class="aba" hidden>
+    <div class="filtros">
+      <select id="c-periodo" aria-label="Periodo">
+        <option value="semana">esta semana</option>
+        <option value="semana-passada">semana passada</option>
+        <option value="mes" selected>este mes</option>
+        <option value="mes-passado">mes passado</option>
+        <option value="30">ultimos 30 dias</option>
+      </select>
+      <label>de <input id="c-de" type="date"></label>
+      <label>ate <input id="c-ate" type="date"></label>
+      <select id="c-projeto" aria-label="Projeto"></select>
+      <button type="button" id="c-gerar">Abrir documento</button>
+    </div>
+    <p class="muted">O documento abre numa aba nova; Ctrl+P salva como PDF.</p>
+    <ul id="c-lista" class="lista"></ul>
+  </section>
+</main>
+
+<div id="dica" class="dica" role="tooltip" hidden></div>
+<script src="/app.js" type="module"></script>
+</body>
+</html>
