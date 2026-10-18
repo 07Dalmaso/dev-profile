@@ -9,7 +9,8 @@
     "phpt": "comandos/php/phpt.js",
     "tools": "comandos/ferramentas/tools.js",
     "diff-str": "comandos/ferramentas/diff-str.js",
-    "demandas": "comandos/demandas/demandas.js"
+    "demandas": "comandos/demandas/demandas.js",
+    "dalmasodev": "comandos/navegador/dalmasodev.js"
   },
   "dependencies": {
     "@clack/prompts": "^0.11.0",

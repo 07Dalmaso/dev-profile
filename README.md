@@ -62,6 +62,7 @@ Não precisa decorar: `dev` abre um menu com tudo, por área.
 | PHP | `versionphp` | `php -v` |
 | Ferramentas | `tools` | caixa de ferramentas: diff, JSON, Base64, JWT, URL, datas, hash... |
 | Ferramentas | `diff-str` | atalho direto para o comparador de textos |
+| Navegador | `dalmasodev` | abre o **DalmasoDev** no navegador: demandas e todas as ferramentas, só no seu computador |
 
 `gc` e `gp` existem como funções, mas no PowerShell um alias tem prioridade
 sobre uma função, e `gc` (Get-Content) e `gp` (Get-ItemProperty) são aliases
@@ -122,10 +123,8 @@ GitHub liga o commit à demanda (aparece na issue, no app e no painel), e
 `Closes 07Dalmaso/demandas#42` na descrição da PR fecha a demanda no merge.
 Isso funciona quando o código também está no GitHub.
 
-**Painel (só no seu computador):** `demandas painel` abre o dashboard no
-navegador em `127.0.0.1`. Ele usa o login do `gh` (nenhum token novo; a
-credencial nunca vai para o navegador), não aparece na rede, exige uma chave
-aleatória por sessão e não altera nada no GitHub. Ctrl+C no terminal fecha.
+**Painel:** `demandas painel` abre o [DalmasoDev](#dalmasodev) já na aba
+Demandas.
 
 **Projetos:** cada demanda pode ter um projeto (o label `projeto:<nome>`).
 Rodando `demandas` dentro da pasta de um projeto, ele já sabe qual é: pelo
@@ -220,6 +219,34 @@ tabs e caracteres invisíveis aparecem marcados (`·`, `→`, `⍽`, `⌀`), e n
 vem um aviso quando a única diferença é CRLF x LF, espaço ou maiúscula/minúscula.
 Sai com código 0 se os textos forem iguais e 1 se forem diferentes.
 
+### DalmasoDev
+
+```powershell
+dalmasodev          # abre no navegador (ou: dev > Navegador)
+dalmasodev json     # abre direto numa aba
+```
+
+Um site que roda **só no seu computador** com as abas Demandas (painel,
+lista, código ligado a cada demanda, relatório) e as 10 ferramentas do
+`tools`. No navegador, as ferramentas atualizam enquanto você digita, aceitam
+arquivo arrastado e têm botão de copiar; o comparador mostra A e B lado a lado.
+
+É o mesmo código do terminal: cada ferramenta tem um *motor* em
+`lib/tools/motor/`, usado pelo menu do terminal e pelo site. Corrigiu num,
+vale nos dois.
+
+Segurança:
+
+- escuta só em `127.0.0.1` (não aparece na rede) e exige uma chave aleatória
+  por sessão; outro site aberto no navegador não consegue ler as respostas;
+- o que você cola (tokens, JWT, JSON) é processado aqui e não vai para
+  nenhum serviço de fora;
+- as demandas usam o login do `gh` (nenhum token novo; a credencial nunca vai
+  para o navegador) e o site não altera nada no GitHub;
+- fica no ar enquanto o terminal estiver aberto; Ctrl+C fecha.
+
+O que estiver desativado no `dev` → configurar também some do site.
+
 ## Como está organizado
 
 Uma regra: **o nome do arquivo é o nome do comando, e a pasta é a área.**
@@ -230,13 +257,16 @@ comandos/                  o que você digita no terminal
   demandas/  demandas.js
   php/   cachephp.ps1 ...  phpt.js  mig.js
   ferramentas/  tools.js  diff-str.js
+  navegador/  dalmasodev.js
   dev/   dev.ps1
 lib/                       as partes internas, uma pasta por comando
   comum/   clipboard, editor, entrada, saida, processo, config, prompts
-  tools/   uma ferramenta por arquivo; index.js é a lista do menu (+ suporte/)
+  tools/   menu do terminal de cada ferramenta; index.js é a lista
+    motor/   a lógica de cada ferramenta (usada pelo terminal e pelo site)
   phpt/    uma ação por arquivo; index.js é a lista do menu (+ suporte/)
   mig/     leitura das conexões e regras de nome
-  demandas/  uma ação por arquivo; index.js é a lista do menu (+ suporte/ e painel/: servidor e site local)
+  demandas/  uma ação por arquivo; index.js é a lista do menu (+ suporte/)
+  web/     o DalmasoDev: servidor, rotas e site/ (uma tela por ferramenta)
   dev/     descoberta dos comandos, menu e configuração
 profile-carregar.ps1       carrega comandos\*\*.ps1, menos os desativados
 scripts/install.ps1        o instalador (chamado pelo install.cmd)
@@ -260,9 +290,15 @@ function glog { git log --oneline -10 }
 e o comentário na segunda linha), registre em `"bin"` no `package.json` e rode
 `npm link` (ou o `install.cmd`).
 
-**Uma ferramenta no `tools`:** crie `lib/tools/<nome>.js` exportando
-`{ id, label, hint, executar }` e adicione uma linha na lista de
-`lib/tools/index.js`.
+**Uma ferramenta no `tools`:**
+
+1. a lógica em `lib/tools/motor/<nome>.js` (recebe a entrada, devolve dados,
+   sem perguntar nada);
+2. o menu do terminal em `lib/tools/<nome>.js` exportando
+   `{ id, label, hint, executar }`, e uma linha em `lib/tools/index.js`;
+3. para aparecer no DalmasoDev: uma linha em `MOTORES` de
+   `lib/web/ferramentas.js` e a tela em `lib/web/site/ferramentas/<nome>.js`
+   (sem a tela, ela fica só no terminal).
 
 **Uma ação no `phpt`:** crie `lib/phpt/<nome>.js` exportando
 `{ id, label, hint, fw, executar }` (`fw` limita a `['laravel']`, `['yii']` ou
